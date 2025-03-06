@@ -23,7 +23,7 @@ RUN apt-get install -y \
     netcat \
     && pip3 install --upgrade pip
 
-Run apt-get install nano
+RUN apt-get install nano
 
 # Add WineHQ repository key and APT source
 RUN wget -q https://dl.winehq.org/wine-builds/winehq.key > /dev/null 2>&1\
