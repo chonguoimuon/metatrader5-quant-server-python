@@ -45,8 +45,8 @@ This project provides a Docker-based setup to run MetaTrader 5 (MT5) using Wine 
 1. **Clone the Repository**
 
    ```bash
-   git clone --single-branch https://github.com/chonguoimuon/metatrader5-quant-server-python.git
-   cd metatrader5-linux-django-docker
+   git clone https://github.com/chonguoimuon/metatrader5-quant-server-python.git
+   cd metatrader5-quant-server-python
    ```
 
 2. **Configure Environment Variables**
