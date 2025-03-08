@@ -26,10 +26,13 @@ RUN apt-get install -y \
 RUN apt-get install nano
 
 # Add WineHQ repository key and APT source
-RUN wget -q https://dl.winehq.org/wine-builds/winehq.key > /dev/null 2>&1\
-    && apt-key add winehq.key \
-    && add-apt-repository 'deb https://dl.winehq.org/wine-builds/debian/ bullseye main' \
-    && rm winehq.key
+#RUN wget -q https://dl.winehq.org/wine-builds/winehq.key > /dev/null 2>&1\
+#    && apt-key add winehq.key \
+#    && add-apt-repository 'deb https://dl.winehq.org/wine-builds/debian/ bullseye main' \
+#    && rm winehq.key
+
+RUN wget -qO- https://dl.winehq.org/wine-builds/winehq.key | gpg --dearmor -o /usr/share/keyrings/winehq-archive-keyring.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/winehq-archive-keyring.gpg] https://dl.winehq.org/wine-builds/debian/ bullseye main" > /etc/apt/sources.list.d/winehq.list
 
 # Add i386 architecture and update package lists
 RUN dpkg --add-architecture i386 \
