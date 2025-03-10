@@ -27,8 +27,8 @@ fi
 # Recheck if MetaTrader 5 is installed
 if [ -e "$mt5file" ]; then
     log_message "INFO" "File $mt5file is installed. Running MT5..."
-    $wine_executable "$mt5file" &
-    rm -f /tmp/mt5setup.exe
+    $wine_executable "$mt5file" 
+#    rm -f /tmp/mt5setup.exe
 else
     log_message "ERROR" "File $mt5file is not installed. MT5 cannot be run."
 fi
