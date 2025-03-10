@@ -5,12 +5,12 @@ ENV TITLE=MetaTrader
 ENV WINEARCH=win64
 ENV WINEPREFIX="/config/.wine"
 ENV DISPLAY=:0
-ENV DEBIAN_FRONTEND=noninteractive
+#ENV DEBIAN_FRONTEND=noninteractive
 
 # Ensure the directory exists with correct permissions
-#RUN mkdir -p /config/.wine && \
-#    chown -R abc:abc /config/.wine && \
-#    chmod -R 755 /config/.wine
+RUN mkdir -p /config/.wine && \
+    chown -R abc:abc /config/.wine && \
+    chmod -R 755 /config/.wine
 
 # Update package lists and upgrade packages
 RUN apt-get update && apt-get upgrade -y
@@ -25,21 +25,20 @@ RUN apt-get install -y \
     && pip3 install --upgrade pip
 
 # Add WineHQ repository key and APT source
-#RUN wget -q https://dl.winehq.org/wine-builds/winehq.key > /dev/null 2>&1\
-#    && sudo apt-key add winehq.key \
-#	&& sudo touch /etc/apt/sources.list.d/wine.list \
-#    && sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/debian/ bullseye main' \
-#	&& sudo apt-get update \
-#    && rm winehq.key 
+RUN wget -q https://dl.winehq.org/wine-builds/winehq.key > /dev/null 2>&1\
+    && sudo apt-key add winehq.key \
+	&& sudo touch /etc/apt/sources.list.d/wine.list \
+    && sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/debian/ bullseye main' \
+    && rm winehq.key 
 
 # Download and store the WineHQ key securely
-RUN wget -qO- https://dl.winehq.org/wine-builds/winehq.key \
-    | gpg --dearmor \
-    | sudo tee /usr/share/keyrings/winehq-archive-keyring.gpg
+#RUN wget -qO- https://dl.winehq.org/wine-builds/winehq.key \
+#    | gpg --dearmor \
+#    | sudo tee /usr/share/keyrings/winehq-archive-keyring.gpg
 
 # Add the WineHQ repository with a reference to the key
-RUN echo "deb [signed-by=/usr/share/keyrings/winehq-archive-keyring.gpg] https://dl.winehq.org/wine-builds/debian/ bullseye main" \
-    | sudo tee /etc/apt/sources.list.d/winehq.list
+#RUN echo "deb [signed-by=/usr/share/keyrings/winehq-archive-keyring.gpg] https://dl.winehq.org/wine-builds/debian/ bullseye main" \
+#    | sudo tee /etc/apt/sources.list.d/winehq.list
 
 
 # Add i386 architecture and update package lists
