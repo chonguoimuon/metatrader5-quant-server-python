@@ -17,17 +17,17 @@ else
 	else
 		log_message "INFO" "Downloading MT5 installer..."
 		wget -O /tmp/mt5setup.exe $mt5setup_url > /dev/null 2>&1
-	fi	
+	fi
 	
     log_message "INFO" "Installing MetaTrader 5..."
-    $wine_executable /tmp/mt5setup.exe /auto & 
-	wait    
+    $wine_executable /tmp/mt5setup.exe /auto &
+    wait    
 fi
 
 # Recheck if MetaTrader 5 is installed
 if [ -e "$mt5file" ]; then
     log_message "INFO" "File $mt5file is installed. Running MT5..."
-    $wine_executable "$mt5file" 
+    $wine_executable "$mt5file" &
 #    rm -f /tmp/mt5setup.exe
 else
     log_message "ERROR" "File $mt5file is not installed. MT5 cannot be run."
