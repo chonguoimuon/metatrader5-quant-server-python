@@ -5,11 +5,12 @@ ENV TITLE=MetaTrader
 ENV WINEARCH=win64
 ENV WINEPREFIX="/config/.wine"
 ENV DISPLAY=:0
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Ensure the directory exists with correct permissions
-RUN mkdir -p /config/.wine && \
-    chown -R abc:abc /config/.wine && \
-    chmod -R 755 /config/.wine
+#RUN mkdir -p /config/.wine && \
+#    chown -R abc:abc /config/.wine && \
+#    chmod -R 755 /config/.wine
 
 # Update package lists and upgrade packages
 RUN apt-get update && apt-get upgrade -y
@@ -23,20 +24,29 @@ RUN apt-get install -y \
     netcat \
     && pip3 install --upgrade pip
 
-RUN apt-get install nano
-
 # Add WineHQ repository key and APT source
 #RUN wget -q https://dl.winehq.org/wine-builds/winehq.key > /dev/null 2>&1\
-#    && apt-key add winehq.key \
-#    && add-apt-repository 'deb https://dl.winehq.org/wine-builds/debian/ bullseye main' \
-#    && rm winehq.key
+#    && sudo apt-key add winehq.key \
+#	&& sudo touch /etc/apt/sources.list.d/wine.list \
+#    && sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/debian/ bullseye main' \
+#	&& sudo apt-get update \
+#    && rm winehq.key 
 
-RUN wget -qO- https://dl.winehq.org/wine-builds/winehq.key | gpg --dearmor -o /usr/share/keyrings/winehq-archive-keyring.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/winehq-archive-keyring.gpg] https://dl.winehq.org/wine-builds/debian/ bullseye main" > /etc/apt/sources.list.d/winehq.list
+# Download and store the WineHQ key securely
+RUN wget -qO- https://dl.winehq.org/wine-builds/winehq.key \
+    | gpg --dearmor \
+    | sudo tee /usr/share/keyrings/winehq-archive-keyring.gpg
+
+# Add the WineHQ repository with a reference to the key
+RUN echo "deb [signed-by=/usr/share/keyrings/winehq-archive-keyring.gpg] https://dl.winehq.org/wine-builds/debian/ bullseye main" \
+    | sudo tee /etc/apt/sources.list.d/winehq.list
+
 
 # Add i386 architecture and update package lists
-RUN dpkg --add-architecture i386 \
-    && apt-get update
+RUN sudo dpkg --add-architecture i386 
+
+# Update package lists
+RUN apt-get update
 
 # Install WineHQ stable package and dependencies
 RUN apt-get install --install-recommends -y \
