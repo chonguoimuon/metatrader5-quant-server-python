@@ -20,8 +20,7 @@ else
 	fi
 	
     log_message "INFO" "Installing MetaTrader 5..."
-    $wine_executable /tmp/mt5setup.exe /auto &
-    wait    
+    $wine_executable /tmp/mt5setup.exe /auto 
 fi
 
 # Recheck if MetaTrader 5 is installed
