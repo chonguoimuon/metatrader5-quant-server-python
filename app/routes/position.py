@@ -143,8 +143,9 @@ def close_all_positions_endpoint():
         data = request.get_json() or {}
         order_type = data.get('order_type', 'all')
         magic = data.get('magic')
+        comment = data.get('comment', '')
         
-        results = close_all_positions(order_type, magic)
+        results = close_all_positions(order_type, comment, magic)
         if not results:
             return jsonify({"message": "No positions were closed"}), 200
         
@@ -242,12 +243,17 @@ def modify_sl_tp_endpoint():
     'tags': ['Position'],
     'parameters': [
         {
-            'name': 'magic',
-            'in': 'query',
-            'type': 'integer',
+            'name': 'body',
+            'in': 'body',
             'required': False,
-            'description': 'Magic number to filter positions.'
-        }
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'comment': {'type': 'string'},
+                    'magic': {'type': 'integer'}
+                }
+            }
+        }        
     ],
     'responses': {
         200: {
@@ -295,9 +301,12 @@ def get_positions_endpoint():
     description: Retrieve all open trading positions, optionally filtered by magic number.
     """
     try:
-        magic = request.args.get('magic', type=int)
+#        magic = request.args.get('magic', type=int)
+        data = request.get_json() or {}
+        magic = data.get('magic')
+        comment = data.get('comment', '')
 
-        positions_df = get_positions(magic)
+        positions_df = get_positions(comment, magic)
 
         if positions_df is None:
             return jsonify({"error": "Failed to retrieve positions"}), 500

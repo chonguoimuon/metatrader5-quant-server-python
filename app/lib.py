@@ -118,7 +118,7 @@ def close_all_positions(order_type='all', comment='', magic=None, type_filling=m
         logger.error("No open positions to close.")
         return []
 
-def get_positions(magic=None):
+def get_positions(comment='', magic=None):
     # First check if MT5 is initialized
     if not mt5.initialize():
         logger.error("Failed to initialize MT5.")
@@ -137,6 +137,10 @@ def get_positions(magic=None):
 
         positions_data = [pos._asdict() for pos in positions]
         positions_df = pd.DataFrame(positions_data)
+
+        # Filtering by comment if specified
+        if comment !='':
+            positions_df = positions_df[positions_df['comment'] == comment]
 
         if magic is not None:
             positions_df = positions_df[positions_df['magic'] == magic]
