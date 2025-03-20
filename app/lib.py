@@ -71,7 +71,7 @@ def close_position(position, deviation=20, magic=0, comment='', type_filling=mt5
     return order_result
 
 
-def close_all_positions(order_type='all', magic=None, type_filling=mt5.ORDER_FILLING_IOC):
+def close_all_positions(order_type='all', comment='', magic=None, type_filling=mt5.ORDER_FILLING_IOC):
     order_type_dict = {
         'BUY': mt5.ORDER_TYPE_BUY,
         'SELL': mt5.ORDER_TYPE_SELL
@@ -85,6 +85,10 @@ def close_all_positions(order_type='all', magic=None, type_filling=mt5.ORDER_FIL
 
         positions_data = [pos._asdict() for pos in positions]
         positions_df = pd.DataFrame(positions_data)
+
+        # Filtering by comment if specified
+        if comment !='':
+            positions_df = positions_df[positions_df['comment'] == comment]
 
         # Filtering by magic if specified
         if magic is not None:

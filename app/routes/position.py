@@ -95,6 +95,7 @@ def close_position_endpoint():
                 'type': 'object',
                 'properties': {
                     'order_type': {'type': 'string', 'enum': ['BUY', 'SELL', 'all'], 'default': 'all'},
+                    'comment': {'type': 'string'},
                     'magic': {'type': 'integer'}
                 }
             }
