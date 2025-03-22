@@ -238,7 +238,7 @@ def modify_sl_tp_endpoint():
         logger.error(f"Error in modify_sl_tp: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
-@position_bp.route('/get_positions', methods=['GET'])
+@position_bp.route('/get_positions', methods=['POST'])
 @swag_from({
     'tags': ['Position'],
     'parameters': [
@@ -298,7 +298,7 @@ def get_positions_endpoint():
     """
     Get Open Positions
     ---
-    description: Retrieve all open trading positions, optionally filtered by magic number.
+    description: Retrieve all open trading positions, optionally filtered by magic number / comment string.
     """
     try:
 #        magic = request.args.get('magic', type=int)
