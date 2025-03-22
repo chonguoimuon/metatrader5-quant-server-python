@@ -71,7 +71,7 @@ def close_position(position, deviation=20, magic=0, comment='', type_filling=mt5
     return order_result
 
 
-def close_all_positions(order_type='all', comment='', magic=None, type_filling=mt5.ORDER_FILLING_IOC):
+def close_all_positions(order_type='all', symbol='', comment='', magic=None, type_filling=mt5.ORDER_FILLING_IOC):
     order_type_dict = {
         'BUY': mt5.ORDER_TYPE_BUY,
         'SELL': mt5.ORDER_TYPE_SELL
@@ -85,6 +85,10 @@ def close_all_positions(order_type='all', comment='', magic=None, type_filling=m
 
         positions_data = [pos._asdict() for pos in positions]
         positions_df = pd.DataFrame(positions_data)
+
+        # Filtering by symbol if specified
+        if symbol !='':
+            positions_df = positions_df[positions_df['symbol'] == symbol]
 
         # Filtering by comment if specified
         if comment !='':
@@ -118,7 +122,7 @@ def close_all_positions(order_type='all', comment='', magic=None, type_filling=m
         logger.error("No open positions to close.")
         return []
 
-def get_positions(comment='', magic=None):
+def get_positions(symbol='', comment='', magic=None):
     # First check if MT5 is initialized
     if not mt5.initialize():
         logger.error("Failed to initialize MT5.")
@@ -137,6 +141,10 @@ def get_positions(comment='', magic=None):
 
         positions_data = [pos._asdict() for pos in positions]
         positions_df = pd.DataFrame(positions_data)
+
+        # Filtering by symbol if specified
+        if symbol !='':
+            positions_df = positions_df[positions_df['symbol'] == symbol]
 
         # Filtering by comment if specified
         if comment !='':

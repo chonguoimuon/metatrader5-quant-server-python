@@ -95,6 +95,7 @@ def close_position_endpoint():
                 'type': 'object',
                 'properties': {
                     'order_type': {'type': 'string', 'enum': ['BUY', 'SELL', 'all'], 'default': 'all'},
+                    'symbol': {'type': 'string'},
                     'comment': {'type': 'string'},
                     'magic': {'type': 'integer'}
                 }
@@ -144,8 +145,9 @@ def close_all_positions_endpoint():
         order_type = data.get('order_type', 'all')
         magic = data.get('magic')
         comment = data.get('comment', '')
+        symbol = data.get('symbol', '')
         
-        results = close_all_positions(order_type, comment, magic)
+        results = close_all_positions(order_type, symbol, comment, magic)
         if not results:
             return jsonify({"message": "No positions were closed"}), 200
         
@@ -249,6 +251,7 @@ def modify_sl_tp_endpoint():
             'schema': {
                 'type': 'object',
                 'properties': {
+                    'symbol': {'type': 'string'},
                     'comment': {'type': 'string'},
                     'magic': {'type': 'integer'}
                 }
@@ -305,8 +308,9 @@ def get_positions_endpoint():
         data = request.get_json() or {}
         magic = data.get('magic')
         comment = data.get('comment', '')
+        symbol = data.get('symbol', '')
 
-        positions_df = get_positions(comment, magic)
+        positions_df = get_positions(symbol, comment, magic)
 
         if positions_df is None:
             return jsonify({"error": "Failed to retrieve positions"}), 500
