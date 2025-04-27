@@ -3,9 +3,7 @@
 # Set variables
 mt5setup_url="https://download.mql5.com/cdn/web/metaquotes.software.corp/mt5/mt5setup.exe"
 mt5file="/config/.wine/drive_c/Program Files/MetaTrader 5/terminal64.exe"
-mt5setup_file="/tmp/mt5setup.exe"
 python_url="https://www.python.org/ftp/python/3.9.13/python-3.9.13-amd64.exe"
-mono_url="https://dl.winehq.org/wine/wine-mono/8.0.0/wine-mono-8.0.0-x86.msi"
 wine_executable="wine"
 metatrader_version="5.0.36"
 mt5server_port=18812
