@@ -27,18 +27,10 @@ logger = logging.getLogger(__name__)
             'schema': {
                 'type': 'object',
                 'properties': {
-                    'position': {
-                        'type': 'object',
-                        'properties': {
-                            'type': {'type': 'integer'},
-                            'ticket': {'type': 'integer'},
-                            'symbol': {'type': 'string'},
-                            'volume': {'type': 'number'}
-                        },
-                        'required': ['type', 'ticket', 'symbol', 'volume']
-                    }
+                    'ticket': {'type': 'integer', 'description': 'Ticket number of the position to close.'},
+                    'type_filling': {'type': 'string', 'enum': ['ORDER_FILLING_IOC', 'ORDER_FILLING_FOK', 'ORDER_FILLING_RETURN'], 'description': 'Order filling type (IOC, FOK, or RETURN).'}
                 },
-                'required': ['position']
+                'required': ['ticket']
             }
         }
     ],
@@ -80,12 +72,44 @@ def close_position_endpoint():
     try:
         # Removed scheduler import
 
-        data = request.get_json()
-        if not data or 'position' not in data:
-            return jsonify({"error": "Position data is required"}), 400
+        # data = request.get_json()     
+        
+        # if not data or 'position' not in data:
+            # return jsonify({"error": "Position data is required"}), 400
 
-        position_ticket = data['position'].get('ticket') # Get ticket to potentially remove job
-        result = close_position(data['position'])
+        # position_ticket = data['position'].get('ticket') # Get ticket to potentially remove job
+
+        data = request.get_json()
+        if not data or 'ticket' not in data:
+            return jsonify({"error": "ticket is required"}), 400
+
+        position_ticket = data.get('ticket')
+
+        # Fetch the position details using the ticket
+        positions = mt5.positions_get(ticket=position_ticket)
+
+        if positions is None or len(positions) == 0:
+            logger.error(f"Position with ticket {position_ticket} not found.")
+            return jsonify({"error": f"Position with ticket {position_ticket} not found."}), 404
+
+        # We found the position, now close it using the lib function
+        position_to_close = positions[0]._asdict() # Convert Position object to dictionary
+        
+        
+        type_filling_str = data.get('type_filling', 'ORDER_FILLING_IOC').upper()
+        # Map filling type string to MT5 constant
+        type_filling_map = {
+            'ORDER_FILLING_IOC': mt5.ORDER_FILLING_IOC,
+            'ORDER_FILLING_FOK': mt5.ORDER_FILLING_FOK,
+            'ORDER_FILLING_RETURN': mt5.ORDER_FILLING_RETURN
+        }
+        type_filling = type_filling_map.get(type_filling_str)
+        if type_filling is None:
+             return jsonify({"error": f"Invalid filling type: {type_filling_str}. Must be 'ORDER_FILLING_IOC', 'ORDER_FILLING_FOK', or 'ORDER_FILLING_RETURN'."}), 400
+
+        
+        # result = close_position(data['position'],type_filling=type_filling)
+        result = close_position(position_to_close, type_filling=type_filling)
 
         if result is None:
             return jsonify({"error": "Failed to close position"}), 400
@@ -115,6 +139,7 @@ def close_position_endpoint():
                     'order_type': {'type': 'string', 'enum': ['BUY', 'SELL', 'all'], 'default': 'all'},
                     'symbol': {'type': 'string'},
                     'comment': {'type': 'string'},
+                    'type_filling': {'type': 'string', 'enum': ['ORDER_FILLING_IOC', 'ORDER_FILLING_FOK', 'ORDER_FILLING_RETURN'], 'description': 'Order filling type (IOC, FOK, or RETURN).'},
                     'magic': {'type': 'integer'}
                 }
             }
@@ -166,13 +191,25 @@ def close_all_positions_endpoint():
         magic = data.get('magic')
         comment = data.get('comment', '')
         symbol = data.get('symbol', '')
-
+        type_filling_str = data.get('type_filling', 'ORDER_FILLING_IOC').upper()
+        
+        # Map filling type string to MT5 constant
+        type_filling_map = {
+            'ORDER_FILLING_IOC': mt5.ORDER_FILLING_IOC,
+            'ORDER_FILLING_FOK': mt5.ORDER_FILLING_FOK,
+            'ORDER_FILLING_RETURN': mt5.ORDER_FILLING_RETURN
+        }
+        type_filling = type_filling_map.get(type_filling_str)
+        if type_filling is None:
+             return jsonify({"error": f"Invalid filling type: {type_filling_str}. Must be 'ORDER_FILLING_IOC', 'ORDER_FILLING_FOK', or 'ORDER_FILLING_RETURN'."}), 400
+        
+        
         # Get positions before closing to know which jobs to remove
         positions_to_close_df = get_positions(symbol, comment, magic)
         positions_to_close_tickets = positions_to_close_df['ticket'].tolist() if not positions_to_close_df.empty else []
 
 
-        results = close_all_positions(order_type, symbol, comment, magic)
+        results = close_all_positions(order_type, symbol, comment, magic, type_filling)
         if not results:
             return jsonify({"message": "No positions were closed"}), 200
 
