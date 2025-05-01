@@ -39,19 +39,21 @@ app.register_blueprint(error_bp)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 if __name__ == '__main__':
-    if not mt5.initialize():
-        logger.error("Failed to initialize MT5.")
+    # if not mt5.initialize():
+        # logger.error("Failed to initialize MT5.")
         # Consider exiting or handling this more gracefully in a production app
-    else:
-        logger.info("MT5 initialized successfully.")
+    # else:
+        # logger.info("MT5 initialized successfully.")
         # Start the trailing stop worker thread after MT5 is initialized
-        start_worker()
+        # start_worker()
 
 
     # The Flask app.run() call is blocking, so the worker will run in the background thread
     # It's important that the worker is started before the app runs.
     try:
+        start_worker()
         app.run(host='0.0.0.0', port=int(os.environ.get('MT5_API_PORT')))
+        
     finally:
         # Ensure the worker thread is stopped when the app exits
         stop_worker()
